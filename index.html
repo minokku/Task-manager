@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Task Manager</title>
+</head>
+<body>
+    <div id="app">
+        <div id="auth" v-if="!user">
+            <h2>Sign Up / Log In</h2>
+            <input type="text" v-model="username" placeholder="Username">
+            <input type="password" v-model="password" placeholder="Password">
+            <button @click="signup">Sign Up</button>
+            <button @click="login">Log In</button>
+        </div>
+        <div id="tasks" v-if="user">
+            <h2>Task Manager</h2>
+            <input type="text" v-model="taskText" placeholder="New Task">
+            <button @click="addTask">Add Task</button>
+            <div>
+                <label>Show:
+                    <select v-model="filter">
+                        <option value="all">All Tasks</option>
+                        <option value="completed">Completed Tasks</option>
+                        <option value="active">Active Tasks</option>
+                    </select>
+                </label>
+            </div>
+            <ul>
+                <li v-for="task in filteredTasks" :key="task.id">
+                    <span :class="{ completed: task.completed, editing: task.id === editingTask }">
+                        {{ task.id === editingTask ? '' : task.text }}
+                    </span>
+                    <input v-if="task.id === editingTask" v-model="taskText" @keyup.enter="saveEditedTask" @keyup.esc="cancelEdit">
+                    <button @click="updateTask(task.id, !task.completed)" v-if="task.id !== editingTask">Toggle</button>
+                    <button @click="deleteTask(task.id)" v-if="task.id !== editingTask">Delete</button>
+                    <button @click="editTask(task.id)" v-if="task.id !== editingTask">Edit</button>
+                    <div class="modal" v-if="showModal">
+                        <div class="modal-content">
+                            <span class="modal-close" @click="toggleModal">&times;</span>
+                            <h2>Edit Task</h2>
+                            <input type="text" v-model="taskText" placeholder="Edit Task">
+                            <button @click="saveChanges">Save Changes</button>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <button @click="logout">Log Out</button>
+            <button @click="clearCompletedTasks">Clear Completed</button>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="app.js"></script>
+</body>
+</html>
